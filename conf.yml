@@ -1,0 +1,6 @@
+forecast:
+  url: "https://tenki.jp/forecast/3/16/4410/13109"
+slack:
+  token: "xoxp-"
+no_smoking:
+  started_at: "2018/06/29"
