@@ -11,7 +11,7 @@
     <key>WorkingDirectory</key>
     <string>/Users/your_name/git/go-slack-weather-status</string>
     <key>StartInterval</key>
-    <integer>600</integer>
+    <integer>3600</integer>
     <key>StandardOutPath</key>
     <string>/Users/your_name/git/go-slack-weather-status/logs/slack-weather-status-with-no-smoking-days.out</string>
     <key>StandardErrorPath</key>
