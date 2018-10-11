@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>SlackWeatherStatusWithNoSmokingDays</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/Users/your_name/git/go-slack-weather-status/slack-weather-status-with-no-smoking-days</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/your_name/git/go-slack-weather-status</string>
+    <key>StartInterval</key>
+    <integer>600</integer>
+    <key>StandardOutPath</key>
+    <string>/Users/your_name/git/go-slack-weather-status/logs/slack-weather-status-with-no-smoking-days.out</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/your_name/git/go-slack-weather-status/logs/slack-weather-status-with-no-smoking-days.err</string>
+  </dict>
+</plist>
