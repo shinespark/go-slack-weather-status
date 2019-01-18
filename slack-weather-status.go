@@ -3,13 +3,13 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/BurntSushi/toml"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/dustin/go-humanize"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/BurntSushi/toml"
+	"github.com/PuerkitoBio/goquery"
 )
 
 func GetForecastDoc(url string) (doc *goquery.Document) {
@@ -33,7 +33,7 @@ func GetForecastDoc(url string) (doc *goquery.Document) {
 	return
 }
 
-func GetForecastEmojiText(doc *goquery.Document) (emoji string, text string) {
+func GetForecastEmojiText(doc *goquery.Document) (h2 string, emoji string, text string) {
 	weatherSymbolMap := map[string]string{
 		"01": ":sunny:",
 		"02": ":mostly_sunny:",
@@ -67,12 +67,15 @@ func GetForecastEmojiText(doc *goquery.Document) (emoji string, text string) {
 		"30": ":snowman:",
 	}
 
+	h2Text := doc.Find("h2").Text()
+	h2 = strings.Split(h2Text, "の天気")[0]
+
 	selection := doc.Find("section.today-weather")
 	iconImg := selection.Find("div.weather-icon img")
 	iconUrl, _ := iconImg.Attr("src")
 	iconTitle, _ := iconImg.Attr("title")
-	splittedIconUrl := strings.Split(iconUrl, "/")
-	iconFileName := splittedIconUrl[len(splittedIconUrl) - 1]
+	splitIconUrl := strings.Split(iconUrl, "/")
+	iconFileName := splitIconUrl[len(splitIconUrl)-1]
 	iconName := strings.TrimSuffix(iconFileName, ".png")
 	iconName = strings.TrimSuffix(iconName, "_n") // on night
 
@@ -97,27 +100,18 @@ func GetForecastEmojiText(doc *goquery.Document) (emoji string, text string) {
 
 type Config struct {
 	ForecastUrl string
-	SlackToken string
-	NoSmokingStartedAt string
-}
-
-func GetNoSmokingDays(startedAt string) (durationDays int64) {
-	parsedStartedAt, _ := time.Parse("2006/01/02 15:04:05 MST", startedAt)
-	duration := time.Now().Sub(parsedStartedAt)
-	durationDays = int64(duration.Hours() / 24)
-
-	return
+	SlackToken  string
 }
 
 func UpdateSlackStatus(emoji string, text string, token string) (err error) {
-	var jsonStr = []byte(fmt.Sprintf(`{"profile": {"status_emoji": "%s", "status_text": "%s"}}`, emoji, text ))
+	var jsonStr = []byte(fmt.Sprintf(`{"profile": {"status_emoji": "%s", "status_text": "%s"}}`, emoji, text))
 
 	req, err := http.NewRequest(
 		"POST",
 		"https://slack.com/api/users.profile.set",
 		bytes.NewBuffer(jsonStr),
 	)
-	if err!= nil {
+	if err != nil {
 		return
 	}
 
@@ -142,11 +136,9 @@ func main() {
 	}
 
 	doc := GetForecastDoc(conf.ForecastUrl)
-	emoji, text:= GetForecastEmojiText(doc)
+	h2, emoji, text := GetForecastEmojiText(doc)
 
-	noSmokingDays := GetNoSmokingDays(conf.NoSmokingStartedAt)
-	text += fmt.Sprintf(", :no_smoking:: %d日目, %s本, %s円", noSmokingDays, humanize.Comma(noSmokingDays * 20), humanize.Comma(noSmokingDays * 460))
-	text += fmt.Sprintf(", 取得: %s", time.Now().Format("15:04"))
+	statusText := fmt.Sprintf("%s: %s, 取得: %s", h2, text, time.Now().Format("15:04"))
 
-	UpdateSlackStatus(emoji, text, conf.SlackToken)
+	UpdateSlackStatus(emoji, statusText, conf.SlackToken)
 }
