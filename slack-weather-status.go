@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -131,8 +130,7 @@ func UpdateSlackStatus(emoji string, text string, token string) (err error) {
 
 func main() {
 	var conf Config
-	absPath, _ := filepath.Abs("./config.toml")
-	_, err := toml.DecodeFile(absPath, &conf)
+	_, err := toml.DecodeFile("config.toml", &conf)
 	if err != nil {
 		panic(err)
 	}
